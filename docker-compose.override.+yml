@@ -1,0 +1,12 @@
+services:
+  app:
+    entrypoint: ["flask", "--app=py-jokes", "run", "--host=10.100.11.12", "--port=8080"]
+    command: ["--debug"]
+    volumes:
+      - ./app/py-jokes/:/opt/app/py-jokes
+  adminer:
+    image: adminer:4.8.1
+    restart: unless-stopped
+    networks:
+      second:
+        ipv4_address: 10.100.12.13

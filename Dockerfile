@@ -14,12 +14,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get install \
       --yes -qq --no-install-recommends \
       git \
-      curl \
       unzip \
-      traceroute \
-      iproute2 \
-      iputils-ping \
-      postgresql \
     && python3 -m venv /opt/app/venv \
     && /opt/app/venv/bin/python3 -m pip install --upgrade \
       pip
