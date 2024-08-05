@@ -43,12 +43,6 @@ services:
         limits:
           cpus: '0.5'
           memory: 32M
-  adminer:
-    image: adminer:4.8.1
-    restart: unless-stopped
-    networks:
-      second:
-        ipv4_address: 10.100.12.13
 networks:
   first:
     driver: bridge
