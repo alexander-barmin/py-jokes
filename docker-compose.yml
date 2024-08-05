@@ -1,0 +1,62 @@
+services:
+  nginx:
+    image: nginx:1.27.0-alpine3.19-slim
+    restart: unless-stopped
+    networks:
+      first:
+        ipv4_address: 10.100.11.10
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 64M
+  postgres:
+    image: postgres:16.3-alpine3.20
+    restart: unless-stopped
+    networks:
+      second:
+        ipv4_address: 10.100.12.10
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+    env_file:
+      - ./env/postgres.env
+  app:
+    image: py-jokes:0.1
+    build: ./
+    restart: unless-stopped
+    entrypoint: ["gunicorn", "py-jokes:app", "--bind=10.100.11.12:8080"]
+    networks:
+      first:
+        ipv4_address: 10.100.11.12
+      second:
+        ipv4_address: 10.100.12.12
+    env_file:
+      - ./env/postgres.env
+    depends_on:
+      - postgres
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 32M
+  adminer:
+    image: adminer:4.8.1
+    restart: unless-stopped
+    networks:
+      second:
+        ipv4_address: 10.100.12.13
+networks:
+  first:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.100.11.0/24
+  second:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.100.12.0/24
